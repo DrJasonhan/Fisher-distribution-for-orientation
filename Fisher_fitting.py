@@ -78,6 +78,25 @@ def rotate_points_back(lon, lat, resultant_orien):
     return lon_adj, lat_adj
 
 
+def fisher_pdf(orientation, kappa, resultant_orien):
+    """
+    calculate the pdf of orientation
+
+    :param orientation:
+        -arraylike (strike, dip) in degree
+    :param kappa:
+        -fisher constant
+    :param resultant_orien:
+        resultant orientation
+    :return: float arraylike
+    """
+    lon, lat = mplstereonet.pole(orientation[0], orientation[1])
+    lon_adj, lat_adj = rotate_points(lon, lat, resultant_orien)
+    lat_adj = lat_adj * np.pi / 180
+    f = kappa * np.sin(lat_adj) * np.exp(kappa * np.cos(lat_adj)) / (2 * np.pi * (np.exp(kappa) - 1))
+    return f
+
+
 def fisher_cdf(theta, kappa):
     """
     calculate the cdf of fisher distribution
@@ -204,3 +223,6 @@ p_x, p_y, p_z = mplstereonet.stereonet2xyz(sampling_lon, sampling_lat)
 scatter_3d(fig, p_x, p_y, p_z)
 p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon, lat)
 scatter_3d(fig, p_x, p_y, p_z)
+
+# calculate the pdf of (strike, dip)
+pdf = fisher_pdf((strike, dip), kappa, resultant_orien)

@@ -172,57 +172,57 @@ def fisher_fit(strike, dip):
     resultant_orien = mplstereonet.plunge_bearing2pole(resultant_v[0], resultant_v[1])
     return kappa, resultant_orien
 
+if __name__ == '__main__':
+    # read data
+    data = pd.read_excel('../Data/Orientation(rockmech)_set2.xlsx')
+    strike = data['strike'].values
+    dip = data['dip'].values
+    # calculate the resultant vector, resultant orientation, and fisher parameters
+    kappa, resultant_orien = fisher_fit(strike, dip)
 
-# read data
-data = pd.read_excel('../Data/Orientation(rockmech)_set2.xlsx')
-strike = data['strike'].values
-dip = data['dip'].values
-# calculate the resultant vector, resultant orientation, and fisher parameters
-kappa, resultant_orien = fisher_fit(strike, dip)
+    # project all the points and the resultant vector on a stereonet
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='stereonet')
+    ax.pole(strike, dip, 'g^', markersize=6)
+    ax.pole(resultant_orien[0], resultant_orien[1], 'b^', markersize=6)
+    ax.grid()
+    plt.show()
 
-# project all the points and the resultant vector on a stereonet
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='stereonet')
-ax.pole(strike, dip, 'g^', markersize=6)
-ax.pole(resultant_orien[0], resultant_orien[1], 'b^', markersize=6)
-ax.grid()
-plt.show()
-
-# # %%
-# # calculate the lon and lat of original vectors
-# lon, lat = mplstereonet.pole(strike, dip)
-# lon_adj, lat_adj = rotate_points(lon, lat, resultant_orien)
-#
-#
-# fig = plt.figure()
-# fig = Axes3D(fig)
-# # project original vector on a sphere
-# p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon, lat)
-# scatter_3d(fig, p_x, p_y, p_z)
-# # project rotated vectors on the sphere
-# p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon_adj, lat_adj)
-# scatter_3d(fig, p_x, p_y, p_z)
+    # # %%
+    # # calculate the lon and lat of original vectors
+    # lon, lat = mplstereonet.pole(strike, dip)
+    # lon_adj, lat_adj = rotate_points(lon, lat, resultant_orien)
+    #
+    #
+    # fig = plt.figure()
+    # fig = Axes3D(fig)
+    # # project original vector on a sphere
+    # p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon, lat)
+    # scatter_3d(fig, p_x, p_y, p_z)
+    # # project rotated vectors on the sphere
+    # p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon_adj, lat_adj)
+    # scatter_3d(fig, p_x, p_y, p_z)
 
 
-# simulate 100 samples, and project original vectors and simulated vectors on a stereonet
-sampling_strike, sampling_dip = fisher_rvs(kappa, 100, resultant_orien)
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='stereonet')
-ax.pole(strike, dip, 'g^', markersize=6)
-ax.pole(sampling_strike, sampling_dip, 'r^', markersize=6)
-ax.grid()
-plt.show()
+    # simulate 100 samples, and project original vectors and simulated vectors on a stereonet
+    sampling_strike, sampling_dip = fisher_rvs(kappa, 100, resultant_orien)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='stereonet')
+    ax.pole(strike, dip, 'g^', markersize=6)
+    ax.pole(sampling_strike, sampling_dip, 'r^', markersize=6)
+    ax.grid()
+    plt.show()
 
-# simulate 100 samples, and project both simulated vectors and original vectors on a sphere
-sampling_lon, sampling_lat = fisher_rvs(kappa, 100, resultant_orien, form='geographic')
-# calculate the lon and lat of original vectors
-lon, lat = mplstereonet.pole(strike, dip)
-fig = plt.figure()
-fig = Axes3D(fig)
-p_x, p_y, p_z = mplstereonet.stereonet2xyz(sampling_lon, sampling_lat)
-scatter_3d(fig, p_x, p_y, p_z)
-p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon, lat)
-scatter_3d(fig, p_x, p_y, p_z)
+    # simulate 100 samples, and project both simulated vectors and original vectors on a sphere
+    sampling_lon, sampling_lat = fisher_rvs(kappa, 100, resultant_orien, form='geographic')
+    # calculate the lon and lat of original vectors
+    lon, lat = mplstereonet.pole(strike, dip)
+    fig = plt.figure()
+    fig = Axes3D(fig)
+    p_x, p_y, p_z = mplstereonet.stereonet2xyz(sampling_lon, sampling_lat)
+    scatter_3d(fig, p_x, p_y, p_z)
+    p_x, p_y, p_z = mplstereonet.stereonet2xyz(lon, lat)
+    scatter_3d(fig, p_x, p_y, p_z)
 
-# calculate the pdf of (strike, dip)
-pdf = fisher_pdf((strike, dip), kappa, resultant_orien)
+    # calculate the pdf of (strike, dip)
+    pdf = fisher_pdf((strike, dip), kappa, resultant_orien)
